@@ -46,3 +46,14 @@ describe("GET /api", () => {
       });
   });
 });
+
+// describe("GET /api/articles", () => {
+//   test("should respond with 200 and arrau of all articles", () => {
+//     return request(app)
+//       .get("/api/articles")
+//       .expect(200)
+//       .then((response) => {
+//         expect(response.body.articles.length).toBe(13);
+//       });
+//   });
+// });
