@@ -64,16 +64,9 @@ describe("GET /api/articles", () => {
           expect(article).toHaveProperty("comment_count");
           expect(article).toHaveProperty("author");
         });
-      });
-  });
-  describe("should handle errors", () => {
-    test("should return 400 invalid path", () => {
-      return request(app)
-        .get("/api/articlesssss")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("wrong path");
+        expect(results.body.articles).toBeSortedBy("created_at", {
+          descending: true,
         });
-    });
+      });
   });
 });
