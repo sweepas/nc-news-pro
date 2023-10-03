@@ -46,3 +46,47 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id", () => {
+  test("should respond with 200 and valid article and the responce object has correct properties", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article.article_id).toBe(1);
+        expect(response.body.article).toHaveProperty(
+          "author",
+          expect.any(String)
+        );
+        expect(response.body.article).toHaveProperty(
+          "article_id",
+          expect.any(Number)
+        );
+        expect(response.body.article).toHaveProperty("body");
+        expect(response.body.article).toHaveProperty("created_at");
+        expect(response.body.article).toHaveProperty(
+          "votes",
+          expect.any(Number)
+        );
+        expect(response.body.article).toHaveProperty("article_img_url");
+      });
+  });
+  describe("Shoud handle errors", () => {
+    test("shpuld return 404 and not found", () => {
+      return request(app)
+        .get("/api/articles/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+  });
+  test("shpuld return 400 and Invalid input", () => {
+    return request(app)
+      .get("/api/articles/not-an-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
