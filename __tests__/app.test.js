@@ -47,6 +47,29 @@ describe("GET /api", () => {
   });
 });
 
+describe("GET /api/articles", () => {
+  test("should respond with 200 and array of all articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((results) => {
+        expect(results.body.articles.length).toBe(13);
+        results.body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).toHaveProperty("author");
+        });
+        expect(results.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+});
 describe("GET /api/articles/:article_id", () => {
   test("should respond with 200 and valid article and the responce object has correct properties", () => {
     return request(app)
