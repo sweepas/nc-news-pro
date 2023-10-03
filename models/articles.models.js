@@ -25,3 +25,15 @@ exports.fetchAllArticles = () => {
       return results.rows;
     });
 };
+exports.fetchCommentsByArticleId = (article_id) => {
+  let query = `SELECT comment_id, votes, created_at, author, body, article_id
+  FROM comments
+  WHERE article_id = $1
+  ORDER BY created_at DESC;`;
+  return db.query(query, [article_id]).then((results) => {
+    if (!results.rows[0]) {
+      return Promise.reject({ status: 404, msg: "Not Found" });
+    }
+    return results.rows;
+  });
+};

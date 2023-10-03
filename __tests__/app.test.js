@@ -94,7 +94,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(response.body.article).toHaveProperty("article_img_url");
       });
   });
-  describe("Shoud handle errors", () => {
+  describe("Error handaling", () => {
     test("shpuld return 404 and not found", () => {
       return request(app)
         .get("/api/articles/999")
@@ -111,5 +111,44 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid input");
       });
+  });
+});
+describe("GET /api/articles/:article_id/comments", () => {
+  test("should return 200 and an array of comments in descending orded by created_at", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toBeInstanceOf(Array);
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+        expect(response.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  describe("Should handle errors", () => {
+    test("should return 404 Not Found if provided with non existing id", () => {
+      return request(app)
+        .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
+    test("should return 404 Not Found if provided with non existing id", () => {
+      return request(app)
+        .get("/api/articles/not-an-id/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid input");
+        });
+    });
   });
 });
