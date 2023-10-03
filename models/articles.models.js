@@ -22,7 +22,6 @@ exports.fetchAllArticles = () => {
     `
     )
     .then((results) => {
-      console.log(results.rows);
-      return results.rows[0];
+      return results.rows;
     });
 };

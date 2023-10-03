@@ -15,7 +15,12 @@ exports.getArticlesByID = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  fetchAllArticles().then((results) => {
-    res.status(200).send(results);
-  });
+  fetchAllArticles()
+    .then((data) => {
+      const articles = { articles: data };
+      res.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

@@ -47,13 +47,33 @@ describe("GET /api", () => {
   });
 });
 
-// describe("GET /api/articles", () => {
-//   test("should respond with 200 and arrau of all articles", () => {
-//     return request(app)
-//       .get("/api/articles")
-//       .expect(200)
-//       .then((response) => {
-//         expect(response.body.articles.length).toBe(13);
-//       });
-//   });
-// });
+describe("GET /api/articles", () => {
+  test("should respond with 200 and array of all articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((results) => {
+        expect(results.body.articles.length).toBe(13);
+        results.body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).toHaveProperty("author");
+        });
+      });
+  });
+  describe("should handle errors", () => {
+    test("should return 400 invalid path", () => {
+      return request(app)
+        .get("/api/articlesssss")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("wrong path");
+        });
+    });
+  });
+});
