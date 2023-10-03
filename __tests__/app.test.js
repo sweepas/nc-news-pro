@@ -3,6 +3,7 @@ const data = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const request = require("supertest");
 const seed = require("../db/seeds/seed");
+const endpointsData = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(data);
@@ -25,12 +26,23 @@ describe("GET /api/topics", () => {
         });
       });
   });
-  test.only("should get 404 bad request", () => {
+  test("should get 404 bad request", () => {
     return request(app)
       .get("/api/not-topics")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("wrong path");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("should responed with status 200 and correct endpoint information", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.apiInfo).toEqual(endpointsData);
       });
   });
 });
