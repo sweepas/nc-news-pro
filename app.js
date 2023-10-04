@@ -5,6 +5,7 @@ const {
   getArticlesByID,
   getAllArticles,
   patchArticleById,
+  postNewComment,
 } = require("./controllers/articles.conrollers");
 const {
   handleCustomErrors,
@@ -25,6 +26,8 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id", getArticlesByID);
 
 app.patch("/api/articles/:article_id", patchArticleById);
+
+app.post("/api/articles/:article_id/comments", postNewComment);
 
 app.all("/*", (req, res, next) => {
   res.status(404).send({ msg: "wrong path" });
