@@ -113,3 +113,108 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("should add a comment for an article", () => {
+    const newComment = {
+      username: "rogersop",
+      body: "example of comprehensive and non biased comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.body).toBe(newComment.body);
+        expect(body.comment).toHaveProperty("article_id", expect.any(Number));
+        expect(body.comment).toHaveProperty("comment_id", expect.any(Number));
+        expect(body.comment).toHaveProperty("author", expect.any(String));
+        expect(body.comment).toHaveProperty("votes", expect.any(Number));
+        expect(body.comment).toHaveProperty("created_at", expect.any(String));
+      });
+  });
+  test("Successfully ignores extra properties on the input body", () => {
+    const newComment = {
+      username: "rogersop",
+      body: "example of comprehensive and non biased comment",
+      comment_id: "191919",
+      votes: 100000,
+      country_of_origin: "Brazil",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.body).toBe(newComment.body);
+        expect(body.comment.comment_id).not.toBe(newComment.comment_id);
+        expect(body.comment).not.toHaveProperty("country_of_origin");
+        expect(body.comment.votes).not.toBe(newComment.votes);
+      });
+  });
+  describe("shoud handle errors when provided with wrong input", () => {
+    test("should respond with 400 bad request when username is not provided", () => {
+      const newComment = {
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    test("should respond with 400 bad request when body is not provided", () => {
+      const newComment = {
+        username: "rogersop",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    test("should respond with 404 not found when id is not found", () => {
+      const newComment = {
+        username: "rogersop",
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/200/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+    test("should respond with 404 not found when provided with non existing ID", () => {
+      const newComment = {
+        username: "rogersop",
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/9999/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+    test("should respond with 404 not found when user is non exiting", () => {
+      const newComment = {
+        username: "not-a-user",
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+  });
+});

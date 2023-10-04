@@ -25,3 +25,17 @@ exports.fetchAllArticles = () => {
       return results.rows;
     });
 };
+
+exports.insertNewComment = (article_id, body, username) => {
+  // if (!username || !body || !article_id) {
+  //   return Promise.reject({ status: 400, msg: "bad request" });
+  // }
+
+  const insertValues = [body, username, article_id];
+
+  const query = `INSERT INTO comments (body, author, article_id)
+  VALUES ($1, $2, $3) RETURNING *`;
+  return db.query(query, insertValues).then((results) => {
+    return results.rows[0];
+  });
+};

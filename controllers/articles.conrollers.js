@@ -1,6 +1,7 @@
 const {
   fetchArticlesById,
   fetchAllArticles,
+  insertNewComment,
 } = require("../models/articles.models");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -19,6 +20,18 @@ exports.getAllArticles = (req, res, next) => {
     .then((data) => {
       const articles = { articles: data };
       res.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postNewComment = (req, res, next) => {
+  const articleId = req.params.article_id;
+  const { username, body } = req.body;
+  insertNewComment(articleId, body, username)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);
