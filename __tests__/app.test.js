@@ -117,16 +117,67 @@ describe("GET /api/articles/:article_id", () => {
 describe("POST /api/articles/:article_id/comments", () => {
   test("should add a comment for an article", () => {
     const newComment = {
-      username: "name of the user",
+      username: "rogersop",
       body: "example of comprehensive and non biased comment",
     };
     return request(app)
-      .post("/api/articles/:article_id/comments")
+      .post("/api/articles/1/comments")
       .send(newComment)
-      .expect(500)
+      .expect(201)
       .then(({ body }) => {
-        // console.log(body);
-        //expect(body).toEqual(newComment);
+        expect(body.comment.body).toBe(newComment.body);
       });
+  });
+  describe("shoud handle errors", () => {
+    test("should respond with 400 bad request when username is not provided", () => {
+      const newComment = {
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    test("should respond with 400 bad request when body is not provided", () => {
+      const newComment = {
+        username: "rogersop",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    test("should respond with 404 not found when id is not found", () => {
+      const newComment = {
+        username: "rogersop",
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/200/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+    test.only("should respond with 404 not found when user is non exiting", () => {
+      const newComment = {
+        username: "not-a-user",
+        body: "example of comprehensive and non biased comment",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
   });
 });

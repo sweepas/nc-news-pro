@@ -26,14 +26,16 @@ exports.fetchAllArticles = () => {
     });
 };
 
-exports.insertNewComment = ({ article_id, body, username }) => {
-  const created_at = Date.now();
-  const votes = 0;
-  const insertValues = [body, votes, username, article_id, created_at];
+exports.insertNewComment = (article_id, body, username) => {
+  if (!username || !body || !article_id) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
 
-  console.log(insertValues);
+  const insertValues = [body, username, article_id];
 
-  let query = `INSERT INTO comments (body, votes, author, article_id, created_at)
-  VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-  return db.query(query, insertValues);
+  let query = `INSERT INTO comments (body, author, article_id)
+  VALUES ($1, $2, $3) RETURNING *`;
+  return db.query(query, insertValues).then((results) => {
+    return results.rows[0];
+  });
 };
