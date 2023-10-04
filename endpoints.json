@@ -44,7 +44,18 @@
       ]
     }
   },
+  "POST /api/articles/:article_id/comments":{
+    "description": "post comment about an article",
+    "queries": ["article_id", "username", "body"],
+    "exampleResponse": {
+      "comment": [
+        {       
+          "body": "I find this existence challenging"
 
+        }
+      ]
+    }
+  },
   "PATCH /api/articles/:article_id":{
     "description": "should incrument votes by provided value",
     "queries": [],
@@ -62,16 +73,11 @@
       ]
     }
   },
-  "POST /api/articles/:article_id/comments":{
-    "description": "post comment about an article",
-    "queries": ["article_id", "username", "body"],
+  "DELETE /api/comments/:comment_id":{
+    "description": "removes comment by id sends no contet back",
+    "queries": ["comment_id"],
     "exampleResponse": {
-      "comment": [
-        {       
-          "body": "I find this existence challenging"
-
-        }
-      ]
     }
+
   }
 }

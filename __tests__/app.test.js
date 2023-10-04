@@ -218,3 +218,93 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Should return 200 and and vote count shoud be incrumented by 1", () => {
+    const body = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(101);
+        expect(body).toHaveProperty("title");
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("topic");
+        expect(body).toHaveProperty("created_at");
+        expect(body).toHaveProperty("article_img_url");
+        expect(body).toHaveProperty("author");
+        expect(body).toHaveProperty("created_at");
+        expect(body).toHaveProperty("votes");
+      });
+  });
+  test("Should return 200 and and vote count shoud be incrumented by 1", () => {
+    const body = { inc_votes: -50 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(50);
+      });
+  });
+  test("Should ignore irrelevant inputs", () => {
+    const body = {
+      inc_votes: -50,
+      title: "changed title",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(50);
+        expect(body.title).not.toBe("changed title");
+      });
+  });
+  test("Should ignore irrelevant inputs", () => {
+    const body = {
+      inc_votes: "not votes",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  describe("should handle errors", () => {
+    test("should return 400 bad request", () => {
+      const body = { not_votes: -50 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(body)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+  });
+});
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should return 204 and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("should return 404 not found if provided with not existing ID", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("should return 404 not found if provided with not existing ID", () => {
+    return request(app)
+      .delete("/api/comments/not-a-valid-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
