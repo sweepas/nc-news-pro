@@ -103,6 +103,14 @@ describe("GET /api/articles/:article_id", () => {
           expect(body.msg).toBe("not found");
         });
     });
+    test("shpuld return 404 and not found when provided with valid id", () => {
+      return request(app)
+        .get("/api/articles/200")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
   });
   test("shpuld return 400 and Invalid input", () => {
     return request(app)
@@ -119,6 +127,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then((response) => {
+        expect(response.body.comments.length).toBe(11);
         expect(response.body.comments).toBeInstanceOf(Array);
         response.body.comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
@@ -137,6 +146,14 @@ describe("GET /api/articles/:article_id/comments", () => {
     test("should return 404 Not Found if provided with non existing id", () => {
       return request(app)
         .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
+    test("should return 404 Not Found if provided with non existing id", () => {
+      return request(app)
+        .get("/api/articles/200/comments")
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Not Found");
