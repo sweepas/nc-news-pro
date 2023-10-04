@@ -8,6 +8,8 @@ exports.handlePsqlErrors = (err, req, res, next) => {
     res.status(400).send({ msg: "Invalid input" });
   } else if (err.code === "23503") {
     res.status(404).send({ msg: "not found" });
+  } else if (err.code === "23502") {
+    res.status(400).send({ msg: "bad request" });
   } else next(err);
 };
 
