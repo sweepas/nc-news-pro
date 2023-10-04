@@ -25,3 +25,15 @@ exports.fetchAllArticles = () => {
       return results.rows;
     });
 };
+
+exports.insertNewComment = ({ article_id, body, username }) => {
+  const created_at = Date.now();
+  const votes = 0;
+  const insertValues = [body, votes, username, article_id, created_at];
+
+  console.log(insertValues);
+
+  let query = `INSERT INTO comments (body, votes, author, article_id, created_at)
+  VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+  return db.query(query, insertValues);
+};

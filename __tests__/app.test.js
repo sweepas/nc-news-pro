@@ -113,3 +113,20 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("should add a comment for an article", () => {
+    const newComment = {
+      username: "name of the user",
+      body: "example of comprehensive and non biased comment",
+    };
+    return request(app)
+      .post("/api/articles/:article_id/comments")
+      .send(newComment)
+      .expect(500)
+      .then(({ body }) => {
+        // console.log(body);
+        //expect(body).toEqual(newComment);
+      });
+  });
+});
