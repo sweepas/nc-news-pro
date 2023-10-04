@@ -25,3 +25,14 @@ exports.fetchAllArticles = () => {
       return results.rows;
     });
 };
+
+exports.editArticleById = (article_id, inc_votes) => {
+  const insertValues = [inc_votes, article_id];
+  const query = `UPDATE articles
+  SET votes = votes + $1
+  WHERE article_id = $2
+  RETURNING *;`;
+  return db.query(query, insertValues).then((results) => {
+    return results.rows[0];
+  });
+};

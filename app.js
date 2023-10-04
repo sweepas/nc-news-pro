@@ -4,6 +4,7 @@ const { getAllTopics, getApiInfo } = require("./controllers/topics.contollers");
 const {
   getArticlesByID,
   getAllArticles,
+  patchArticleById,
 } = require("./controllers/articles.conrollers");
 const {
   handleCustomErrors,
@@ -13,6 +14,8 @@ const {
 
 const app = express();
 
+app.use(express.json());
+
 app.get("/api", getApiInfo);
 
 app.get("/api/topics", getAllTopics);
@@ -20,6 +23,8 @@ app.get("/api/topics", getAllTopics);
 app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticlesByID);
+
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.all("/*", (req, res, next) => {
   res.status(404).send({ msg: "wrong path" });

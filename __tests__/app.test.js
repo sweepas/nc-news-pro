@@ -113,3 +113,60 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Should return 200 and and vote count shoud be incrumented by 1", () => {
+    const body = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(101);
+        expect(body).toHaveProperty("title");
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("topic");
+        expect(body).toHaveProperty("created_at");
+        expect(body).toHaveProperty("article_img_url");
+        expect(body).toHaveProperty("author");
+        expect(body).toHaveProperty("created_at");
+        expect(body).toHaveProperty("votes");
+      });
+  });
+  test("Should return 200 and and vote count shoud be incrumented by 1", () => {
+    const body = { inc_votes: -50 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(50);
+      });
+  });
+  test("Should return 200 and and vote count shoud be incrumented by 1", () => {
+    const body = {
+      inc_votes: -50,
+      title: "changed title",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(body)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(50);
+        expect(body.title).not.toBe("changed title");
+      });
+  });
+  // describe("should handle errors", () => {
+  //   test("should return 400 invalid input", () => {
+  //     const body = { not_votes: -50 };
+  //     return request(app)
+  //       .patch("/api/articles/1")
+  //       .send(body)
+  //       .expect(400)
+  //       .then(({ body }) => {
+  //         expect(body.msg).toBe("wrong input");
+  //       });
+  //   });
+  // });
+});
