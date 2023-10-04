@@ -148,7 +148,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         expect(body.comment.body).toBe(newComment.body);
         expect(body.comment.comment_id).not.toBe(newComment.comment_id);
-        expect(body.comment).not, toHaveProperty("country_of_origin");
+        expect(body.comment).not.toHaveProperty("country_of_origin");
         expect(body.comment.votes).not.toBe(newComment.votes);
       });
   });
