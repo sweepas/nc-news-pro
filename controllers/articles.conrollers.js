@@ -1,7 +1,9 @@
 const {
   fetchArticlesById,
   fetchAllArticles,
+  editArticleById,
   insertNewComment,
+  removeComment,
 } = require("../models/articles.models");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -16,7 +18,8 @@ exports.getArticlesByID = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  fetchAllArticles()
+  const { topic } = req.query;
+  fetchAllArticles(topic)
     .then((data) => {
       const articles = { articles: data };
       res.status(200).send(articles);
@@ -32,6 +35,28 @@ exports.postNewComment = (req, res, next) => {
   insertNewComment(articleId, body, username)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticleById = (req, res, next) => {
+  const articleId = req.params.article_id;
+  const { inc_votes } = req.body;
+  editArticleById(articleId, inc_votes)
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+exports.deleteCommentById = (req, res, next) => {
+  const comment_id = req.params.comment_id;
+  removeComment(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
