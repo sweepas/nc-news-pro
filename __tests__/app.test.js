@@ -308,3 +308,26 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+describe("/api/users", () => {
+  test("should respond with 200 and array of all users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(user).toHaveProperty("username");
+          expect(user).toHaveProperty("name");
+          expect(user).toHaveProperty("avatar_url");
+        });
+      });
+  });
+  test("should get 404 bad request", () => {
+    return request(app)
+      .get("/api/not-users")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("wrong path");
+      });
+  });
+});
