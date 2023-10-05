@@ -1,15 +1,34 @@
 const db = require("../db/connection");
 
 exports.fetchArticlesById = (article_id) => {
-  return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-    .then((results) => {
-      if (!results.rows[0])
-        return Promise.reject({ status: 404, msg: "not found" });
-      return results.rows[0];
-    });
-};
+  const query = `
+SELECT
+  articles.author,
+  articles.title,
+  articles.article_id,
+  articles.body,
+  articles.topic,
+  articles.created_at,
+  articles.votes,
+  articles.article_img_url,
+  COUNT(comments.article_id) AS comment_count
+FROM
+  articles
+LEFT JOIN
+  comments ON articles.article_id = comments.article_id
+  WHERE
+      articles.article_id = $1
+    GROUP BY
+      articles.article_id;
+  `;
 
+  return db.query(query, [article_id]).then((results) => {
+    if (!results.rows[0])
+      return Promise.reject({ status: 404, msg: "not found" });
+    return results.rows[0];
+  });
+};
+// * FROM articles WHERE article_id = $1
 exports.fetchAllArticles = (topic) => {
   let query = `
     SELECT

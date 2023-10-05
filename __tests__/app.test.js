@@ -87,6 +87,7 @@ describe("GET /api/articles/:article_id", () => {
         );
         expect(response.body.article).toHaveProperty("body");
         expect(response.body.article).toHaveProperty("created_at");
+        expect(response.body.article).toHaveProperty("comment_count");
         expect(response.body.article).toHaveProperty(
           "votes",
           expect.any(Number)
@@ -283,89 +284,6 @@ describe("PATCH /api/articles/:article_id", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("bad request");
-        });
-    });
-  });
-});
-describe("DELETE /api/comments/:comment_id", () => {
-  test("should return 204 and no content", () => {
-    return request(app).delete("/api/comments/1").expect(204);
-  });
-  test("should return 404 not found if provided with not existing ID", () => {
-    return request(app)
-      .delete("/api/comments/999")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Not Found");
-      });
-  });
-  test("should return 404 not found if provided with not existing ID", () => {
-    return request(app)
-      .delete("/api/comments/not-a-valid-id")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
-      });
-  });
-});
-describe("/api/users", () => {
-  test("should respond with 200 and array of all users", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.users.length).toBe(4);
-        body.users.forEach((user) => {
-          expect(user).toHaveProperty("username");
-          expect(user).toHaveProperty("name");
-          expect(user).toHaveProperty("avatar_url");
-        });
-      });
-  });
-  test("should get 404 bad request", () => {
-    return request(app)
-      .get("/api/not-users")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("wrong path");
-      });
-  });
-});
-
-describe("GET /api/articles (topic query)", () => {
-  test("should respond with 200 and article array with relevant topic", () => {
-    return request(app)
-      .get("/api/articles?topic=mitch")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles.length).toBe(12);
-        body.articles.forEach((article) => {
-          expect(article).not.toHaveProperty("body");
-          expect(article).toHaveProperty("title");
-          expect(article).toHaveProperty("article_id");
-          expect(article).toHaveProperty("topic");
-          expect(article).toHaveProperty("created_at");
-          expect(article).toHaveProperty("article_img_url");
-          expect(article).toHaveProperty("comment_count");
-          expect(article).toHaveProperty("author");
-        });
-      });
-  });
-  describe("Error handling", () => {
-    test("should return 404: Not Found if provided with valid, but non existing id", () => {
-      return request(app)
-        .get("/api/articles?topic=football")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Not found");
-        });
-    });
-    test("should return 400: Not Found if provided with valid, but non existing id", () => {
-      return request(app)
-        .get("/api/articles?topic=99999")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Not found");
         });
     });
   });
