@@ -333,7 +333,7 @@ describe("/api/users", () => {
   });
 });
 
-describe.only("GET /api/articles (topic query)", () => {
+describe("GET /api/articles (topic query)", () => {
   test("should respond with 200 and article array with relevant topic", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
