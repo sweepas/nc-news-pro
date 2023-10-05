@@ -79,6 +79,7 @@
     "queries": ["comment_id"],
     "exampleResponse": {
     }
+
   },
   "GET /api/users":{
     "description": "serves an array of all users",

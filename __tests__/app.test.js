@@ -87,6 +87,7 @@ describe("GET /api/articles/:article_id", () => {
         );
         expect(response.body.article).toHaveProperty("body");
         expect(response.body.article).toHaveProperty("created_at");
+        expect(response.body.article).toHaveProperty("comment_count");
         expect(response.body.article).toHaveProperty(
           "votes",
           expect.any(Number)
@@ -332,7 +333,7 @@ describe("/api/users", () => {
   });
 });
 
-describe("GET /api/articles (topic query)", () => {
+describe.only("GET /api/articles (topic query)", () => {
   test("should respond with 200 and article array with relevant topic", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
