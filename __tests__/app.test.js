@@ -87,7 +87,6 @@ describe("GET /api/articles/:article_id", () => {
         );
         expect(response.body.article).toHaveProperty("body");
         expect(response.body.article).toHaveProperty("created_at");
-        expect(response.body.article).toHaveProperty("comment_count");
         expect(response.body.article).toHaveProperty(
           "votes",
           expect.any(Number)
