@@ -331,3 +331,42 @@ describe("/api/users", () => {
       });
   });
 });
+
+describe("GET /api/articles (topic query)", () => {
+  test("should respond with 200 and article array with relevant topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).toHaveProperty("author");
+        });
+      });
+  });
+  describe("Error handling", () => {
+    test("should return 404: Not Found if provided with valid, but non existing id", () => {
+      return request(app)
+        .get("/api/articles?topic=football")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+    test("should return 400: Not Found if provided with valid, but non existing id", () => {
+      return request(app)
+        .get("/api/articles?topic=99999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+  });
+});
