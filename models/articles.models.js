@@ -79,12 +79,18 @@ exports.insertNewComment = (article_id, body, username) => {
 };
 
 exports.editArticleById = (article_id, inc_votes) => {
-  const insertValues = [inc_votes, article_id];
+  const insertValues = [article_id];
+  if (inc_votes === undefined) {
+    insertValues.unshift(0);
+  } else insertValues.unshift(inc_votes);
   const query = `UPDATE articles
   SET votes = votes + $1
   WHERE article_id = $2
   RETURNING *;`;
   return db.query(query, insertValues).then((results) => {
+    if (results.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "Not Found" });
+    }
     return results.rows[0];
   });
 };

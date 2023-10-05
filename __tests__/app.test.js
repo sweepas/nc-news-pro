@@ -230,7 +230,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.votes).toBe(101);
         expect(body).toHaveProperty("title");
-        expect(body).toHaveProperty("article_id");
+        expect(body.article_id).toBe(1);
         expect(body).toHaveProperty("topic");
         expect(body).toHaveProperty("created_at");
         expect(body).toHaveProperty("article_img_url");
@@ -247,6 +247,15 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.votes).toBe(50);
+      });
+  });
+  test("Should return 200 and and original article with votes unchanged if not inc-votes provided", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send()
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBe(100);
       });
   });
   test("Should ignore irrelevant inputs", () => {
@@ -276,14 +285,20 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
   describe("should handle errors", () => {
-    test("should return 400 bad request", () => {
-      const body = { not_votes: -50 };
+    test("should return 404 : not found when provided with valid but non existing id", () => {
       return request(app)
-        .patch("/api/articles/1")
-        .send(body)
+        .patch("/api/articles/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
+    test("should return 400 : invalid input, when provided with non existing id ", () => {
+      return request(app)
+        .patch("/api/articles/not-id")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("bad request");
+          expect(body.msg).toBe("Invalid input");
         });
     });
   });
@@ -361,7 +376,15 @@ describe("GET /api/articles (topic query)", () => {
           expect(body.msg).toBe("Not found");
         });
     });
-    test("should return 400: Not Found if provided with valid, but non existing id", () => {
+    test("should return 404: Not Found if provided with valid, but non existing id", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+    test("should return 404: Not Found if provided with valid, but non existing id", () => {
       return request(app)
         .get("/api/articles?topic=99999")
         .expect(404)
