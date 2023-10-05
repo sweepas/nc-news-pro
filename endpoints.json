@@ -73,5 +73,12 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id":{
+    "description": "removes comment by id sends no contet back",
+    "queries": ["comment_id"],
+    "exampleResponse": {
+    }
+
   }
 }

@@ -287,3 +287,24 @@ describe("PATCH /api/articles/:article_id", () => {
     });
   });
 });
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should return 204 and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("should return 404 not found if provided with not existing ID", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("should return 404 not found if provided with not existing ID", () => {
+    return request(app)
+      .delete("/api/comments/not-a-valid-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
