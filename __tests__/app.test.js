@@ -95,10 +95,18 @@ describe("GET /api/articles/:article_id", () => {
         expect(response.body.article).toHaveProperty("article_img_url");
       });
   });
-  describe("Shoud handle errors", () => {
+  describe("Error handaling", () => {
     test("shpuld return 404 and not found", () => {
       return request(app)
         .get("/api/articles/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("not found");
+        });
+    });
+    test("shpuld return 404 and not found when provided with valid id", () => {
+      return request(app)
+        .get("/api/articles/200")
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("not found");
@@ -108,6 +116,55 @@ describe("GET /api/articles/:article_id", () => {
   test("shpuld return 400 and Invalid input", () => {
     return request(app)
       .get("/api/articles/not-an-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("should return 200 and an array of comments in descending orded by created_at", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBe(11);
+        expect(response.body.comments).toBeInstanceOf(Array);
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+        expect(response.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+});
+describe("Should handle errors", () => {
+  test("should return 404 Not Found if provided with non existing id", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("should return 404 Not Found if provided with valid but existing id", () => {
+    return request(app)
+      .get("/api/articles/200/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("should return 400 Bad request if provided with non valid id", () => {
+    return request(app)
+      .get("/api/articles/not-an-id/comments")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid input");
@@ -284,25 +341,27 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid input");
       });
   });
-  describe("should handle errors", () => {
-    test("should return 404 : not found when provided with valid but non existing id", () => {
-      return request(app)
-        .patch("/api/articles/999")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Not Found");
-        });
-    });
-    test("should return 400 : invalid input, when provided with non existing id ", () => {
-      return request(app)
-        .patch("/api/articles/not-id")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Invalid input");
-        });
-    });
+});
+describe("should handle errors", () => {
+  test("should return 404 : not found when provided with valid but non existing id", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
   });
 });
+test("should return 400 : invalid input, when not valid ID ", () => {
+  return request(app)
+    .patch("/api/articles/not-id")
+    .expect(400)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid input");
+    });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("should return 204 and no content", () => {
     return request(app).delete("/api/comments/1").expect(204);

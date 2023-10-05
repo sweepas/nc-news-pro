@@ -1,6 +1,7 @@
 const {
   fetchArticlesById,
   fetchAllArticles,
+  fetchCommentsByArticleId,
   editArticleById,
   insertNewComment,
   removeComment,
@@ -23,6 +24,17 @@ exports.getAllArticles = (req, res, next) => {
     .then((data) => {
       const articles = { articles: data };
       res.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getCommentByArticleId = (req, res, next) => {
+  const article_id = req.params.article_id;
+  fetchCommentsByArticleId(article_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
     })
     .catch((err) => {
       next(err);
