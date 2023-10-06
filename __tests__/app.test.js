@@ -453,3 +453,81 @@ describe("GET /api/articles (topic query)", () => {
     });
   });
 });
+
+describe("GET /api/articles (sorting queries)", () => {
+  test("should sortby author and preferred order", () => {
+    return request(app)
+      .get("/api/articles?sortby=author")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  test("should sortby author and preferred order", () => {
+    return request(app)
+      .get("/api/articles?sortby=author&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("author", { descending: false });
+      });
+  });
+  test("should sort by title in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sortby=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("title", { descending: false });
+      });
+  });
+  test("should sort by topic in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sortby=topic&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("topic", {
+          descending: false,
+        });
+      });
+  });
+  test("should sort by articles in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sortby=votes&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("votes", {
+          descending: false,
+        });
+      });
+  });
+  test("should sort comment count in descending", () => {
+    return request(app)
+      .get("/api/articles?sortby=comment_count&order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
+  describe("should handle errors", () => {
+    test("if provided non existing column should default to created_as", () => {
+      return request(app)
+        .get("/api/articles?sortby=not-valid-column")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+  });
+  test("if provided with existing column but not valid sortby should default to ", () => {
+    return request(app)
+      .get("/api/articles?sortby=article_img_url")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});

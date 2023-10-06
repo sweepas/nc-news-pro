@@ -29,7 +29,17 @@ LEFT JOIN
   });
 };
 
-exports.fetchAllArticles = (topic) => {
+exports.fetchAllArticles = (topic, sortby, order = "DESC") => {
+  const validInput = {
+    author: "author",
+    topic: "topic",
+    createdAt: "created_at",
+    title: "title",
+    article_id: "article_id",
+    votes: "votes",
+    comment_count: "comment_count",
+  };
+
   let query = `
     SELECT
       articles.author,
@@ -49,20 +59,21 @@ exports.fetchAllArticles = (topic) => {
   const values = [];
 
   if (topic) {
-    query += "WHERE articles.topic = $1";
+    query += `WHERE topic = $1`;
+
     values.push(topic);
   }
 
+  const validSortBy = validInput[sortby] || "created_at";
   query += `
     GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC;
+    ORDER BY ${validSortBy} ${order};
   `;
 
   return db.query(query, values).then((results) => {
     if (results.rowCount === 0) {
       return Promise.reject({ status: 404, msg: "Not found" });
     }
-
     return results.rows;
   });
 };
