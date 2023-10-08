@@ -531,3 +531,16 @@ describe("GET /api/articles (sorting queries)", () => {
       });
   });
 });
+
+describe("GET /api/users/:username", () => {
+  test("should return 200 and an object with relevant properties", () => {
+    return request(app)
+      .get("/api/users/lurker")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user).toHaveProperty("username");
+        expect(body.user).toHaveProperty("avatar_url");
+        expect(body.user).toHaveProperty("name");
+      });
+  });
+});
