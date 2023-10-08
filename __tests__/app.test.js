@@ -554,3 +554,67 @@ describe("GET /api/users/:username", () => {
     });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("should return 200 update the votes on a comment given the comment's comment_id", () => {
+    const newVote = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment.votes).toBe(17);
+        expect(body.comment).toHaveProperty("author");
+        expect(body.comment).toHaveProperty("body");
+        expect(body.comment).toHaveProperty("article_id");
+        expect(body.comment).toHaveProperty("votes");
+        expect(body.comment).toHaveProperty("created_at");
+        expect(body.comment).toHaveProperty("comment_id");
+      });
+  });
+  test("Should return 200 and original article with votes unchanged if not inc-votes provided", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send()
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment.votes).toBe(16);
+      });
+  });
+  test("Should return 200 and ignore irrelevant inputs", () => {
+    const newVote = {
+      inc_votes: -1,
+      body: "not valid",
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment.votes).toBe(15);
+        expect(body.comment.body).not.toEqual(newVote.body);
+      });
+  });
+  describe("Should handle errors", () => {
+    test("Should return 404 Not found if provided with valid but non existing id", () => {
+      const newVote = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/comments/999")
+        .send(newVote)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
+    test("Should return 404 Not found if provided with valid but non existing id", () => {
+      const newVote = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/comments/not-a-comment-id")
+        .send(newVote)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid input");
+        });
+    });
+  });
+});

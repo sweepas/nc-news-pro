@@ -4,7 +4,6 @@ const {
   fetchCommentsByArticleId,
   editArticleById,
   insertNewComment,
-  removeComment,
 } = require("../models/articles.models");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -59,16 +58,6 @@ exports.patchArticleById = (req, res, next) => {
   editArticleById(articleId, inc_votes)
     .then((result) => {
       res.status(200).send(result);
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-exports.deleteCommentById = (req, res, next) => {
-  const comment_id = req.params.comment_id;
-  removeComment(comment_id)
-    .then(() => {
-      res.status(204).send();
     })
     .catch((err) => {
       next(err);
