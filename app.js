@@ -1,43 +1,24 @@
 const express = require("express");
-const { getAllTopics, getApiInfo } = require("./controllers/topics.contollers");
 
-const {
-  getArticlesByID,
-  getAllArticles,
-  getCommentByArticleId,
-  patchArticleById,
-  postNewComment,
-  deleteCommentById,
-} = require("./controllers/articles.conrollers");
 const {
   handleCustomErrors,
   handlePsqlErrors,
   handleServerErrors,
 } = require("./controllers/errors.controllers");
 
-const { getAllUsers } = require("./controllers/users.controllers");
+const apiRouter = require("./routes/api-router");
+const articleRouter = require("./routes/article-router");
+const commentsRouter = require("./routes/comments-router");
+const usersRouter = require("./routes/user-router");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/api", getApiInfo);
-
-app.get("/api/topics", getAllTopics);
-
-app.get("/api/articles", getAllArticles);
-
-app.get("/api/articles/:article_id", getArticlesByID);
-
-app.get("/api/articles/:article_id/comments", getCommentByArticleId);
-
-app.patch("/api/articles/:article_id", patchArticleById);
-
-app.post("/api/articles/:article_id/comments", postNewComment);
-
-app.delete("/api/comments/:comment_id", deleteCommentById);
-
-app.get("/api/users", getAllUsers);
+app.use("/api", apiRouter);
+app.use("/api/articles", articleRouter);
+app.use("/api/comments", commentsRouter);
+app.use("/api/users", usersRouter);
 
 app.all("/*", (req, res, next) => {
   res.status(400).send({ msg: "wrong path" });
