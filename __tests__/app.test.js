@@ -538,9 +538,19 @@ describe("GET /api/users/:username", () => {
       .get("/api/users/lurker")
       .expect(200)
       .then(({ body }) => {
-        expect(body.user).toHaveProperty("username");
-        expect(body.user).toHaveProperty("avatar_url");
-        expect(body.user).toHaveProperty("name");
+        expect(body).toHaveProperty("username");
+        expect(body).toHaveProperty("avatar_url");
+        expect(body).toHaveProperty("name");
       });
+  });
+  describe("Should handle errors", () => {
+    test("Should return 404 Not found if provided with non existing user", () => {
+      return request(app)
+        .get("/api/users/non-existing-username")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not Found");
+        });
+    });
   });
 });
