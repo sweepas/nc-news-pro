@@ -118,3 +118,7 @@ exports.fetchCommentsByArticleId = (article_id) => {
     return results.rows;
   });
 };
+
+exports.postNewArticle = (body) => {
+  return db.query();
+};

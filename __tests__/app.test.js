@@ -618,3 +618,19 @@ describe("PATCH /api/comments/:comment_id", () => {
     });
   });
 });
+// describe("POST /api/articles", () => {
+//   test("returns 201 with relevant properties", () => {
+//     const body = {
+//       author: "author",
+//       title: "title",
+//       body: "lorem ipsum",
+//       topic: "topic",
+//       article_img_url: "",
+//     };
+//     return request(app)
+//       .post("/api/articles")
+//       .send(body)
+//       .expect(201)
+//       .then(({ body }) => {});
+//   });
+// });
