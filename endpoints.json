@@ -168,7 +168,6 @@
     }
   },
   "DELETE /api/articles/:article_id":{
-    "description": "deletes article with all corresponding comments. Sends nothing back.",
-    
+    "description": "deletes article with all corresponding comments. Sends nothing back."
   }
 }
