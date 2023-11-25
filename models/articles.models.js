@@ -29,7 +29,7 @@ LEFT JOIN
   });
 };
 
-exports.fetchAllArticles = (topic, sortby, order = "DESC") => {
+exports.fetchAllArticles = (topic, sortby, order = "DESC", limit, page) => {
   const validInput = {
     author: "author",
     topic: "topic",
@@ -39,6 +39,7 @@ exports.fetchAllArticles = (topic, sortby, order = "DESC") => {
     votes: "votes",
     comment_count: "comment_count",
   };
+  const offset = (page - 1) * limit;
 
   let query = `
     SELECT
@@ -67,9 +68,22 @@ exports.fetchAllArticles = (topic, sortby, order = "DESC") => {
   const validSortBy = validInput[sortby] || "created_at";
   query += `
     GROUP BY articles.article_id
-    ORDER BY ${validSortBy} ${order};
+    ORDER BY ${validSortBy} ${order}
   `;
+  if (page || limit) {
+    if (
+      (page !== undefined && (isNaN(page) || page < 1)) ||
+      (limit !== undefined && (isNaN(limit) || limit < 1))
+    ) {
+      return Promise.reject({ status: 400, msg: "bad request" });
+    }
 
+    if (limit === undefined) limit = 10;
+    if (page === undefined) page = 1;
+    const offset = (page - 1) * limit;
+    query += ` LIMIT ${limit} OFFSET ${offset}`;
+  }
+  query += ";";
   return db.query(query, values).then((results) => {
     if (results.rowCount === 0) {
       return Promise.reject({ status: 404, msg: "Not found" });
@@ -106,11 +120,25 @@ exports.editArticleById = (article_id, inc_votes) => {
   });
 };
 
-exports.fetchCommentsByArticleId = (article_id) => {
+exports.fetchCommentsByArticleId = (article_id, page, limit) => {
   let query = `SELECT comment_id, votes, created_at, author, body, article_id
   FROM comments
   WHERE article_id = $1
-  ORDER BY created_at DESC;`;
+  ORDER BY created_at DESC`;
+  //console.log(isNaN(page));
+  if (page || limit) {
+    if (
+      (page !== undefined && (isNaN(page) || page < 1)) ||
+      (limit !== undefined && (isNaN(limit) || limit < 1))
+    ) {
+      return Promise.reject({ status: 400, msg: "bad request" });
+    }
+    if (limit === undefined) limit = 10;
+    if (page === undefined) page = 1;
+    const offset = (page - 1) * limit;
+    query += ` LIMIT ${limit} OFFSET ${offset}`;
+  }
+  query += ";";
   return db.query(query, [article_id]).then((results) => {
     if (!results.rows[0]) {
       return Promise.reject({ status: 404, msg: "Not Found" });

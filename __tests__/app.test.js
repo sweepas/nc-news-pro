@@ -767,18 +767,60 @@ describe("GET /api/articles (topic query)", () => {
   });
   test("should return 400 if provided with negative or non numerical values", () => {
     return request(app)
-      .get("/api/articles?page=-1&limit=c")
+      .get("/api/articles?page=1&limit=c")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("bad request");
       });
   });
-  test("should return 400 if page requested exceeds total count of articles", () => {
+  test("should return 404 if page requested exceeds total count of articles", () => {
     return request(app)
       .get("/api/articles?page=10")
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("bad request");
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
+describe("GET /api/articles/:article_id/comments", () => {
+  test("should paginate results", () => {
+    return request(app)
+      .get("/api/articles/1/comments?page=1&limit=3")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBe(3);
+        expect(response.body.comments).toBeInstanceOf(Array);
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+        expect(response.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("should return 400 if provided with negative or non numerical values", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=3")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBe(3);
+        expect(response.body.comments).toBeInstanceOf(Array);
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+        expect(response.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
       });
   });
 });

@@ -19,30 +19,12 @@ exports.getArticlesByID = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const { topic, sortby, order, limit = 10, page } = req.query;
+  const { topic, sortby, order, limit, page } = req.query;
 
-  fetchAllArticles(topic, sortby, order)
+  fetchAllArticles(topic, sortby, order, limit, page)
     .then((data) => {
-      let result = [];
       const total_count = data.length;
-      if (page) {
-        const offset = (page - 1) * limit;
-        if (
-          isNaN(page) ||
-          page < 1 ||
-          isNaN(limit) ||
-          limit < 1 ||
-          offset > total_count
-        ) {
-          return Promise.reject({ status: 400, msg: "bad request" });
-        }
-        const paginatedData = data.slice(offset, offset + parseInt(limit));
-        result = paginatedData;
-      } else {
-        result = data;
-      }
-
-      res.status(200).send({ articles: result, total_count: total_count });
+      res.status(200).send({ articles: data, total_count: total_count });
     })
     .catch((err) => {
       next(err);
@@ -51,7 +33,8 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getCommentByArticleId = (req, res, next) => {
   const article_id = req.params.article_id;
-  fetchCommentsByArticleId(article_id)
+  const { page, limit } = req.query;
+  fetchCommentsByArticleId(article_id, page, limit)
     .then((comments) => {
       res.status(200).send({ comments });
     })
