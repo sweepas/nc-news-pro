@@ -4,13 +4,14 @@ Link to hosted version
 
 https://nc-news-be-project-lndv.onrender.com/api/
 
-This project involves building a robust API to provide application data programmatically, resembling real-world backend services like Reddit. The database is PostgreSQL, and interactions with it are facilitated using node-postgres.
+This project involves building a robust RESTful API to provide application data programmatically, resembling real-world backend services like Reddit. The database is PostgreSQL, and interactions with it are facilitated using node-postgres.
 
 Technologies
 
 Node.js
 PostgreSQL
 Express.js
+Jest.js
 Other libraries and frameworks
 
 Installation

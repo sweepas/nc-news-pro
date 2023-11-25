@@ -824,3 +824,56 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+describe("POST /api/topics", () => {
+  test("responds with a topic object containing the newly added topic", () => {
+    const newTopic = {
+      slug: "topic name here",
+      description: "description here",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.topic).toBe("topic name here");
+      });
+  });
+  test("should return 400 if provided just one value", () => {
+    const newTopic = {
+      slug: "topic name here",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+  test("should return 400 if provided with numbers", () => {
+    const newTopic = {
+      slug: 15,
+      description: 99,
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+});
+describe("DELETE /api/articles/:article_id", () => {
+  test("should delete article with it respective comments and respond with nothing", () => {
+    return request(app).delete("/api/articles/2").expect(204);
+  });
+  test("should return 404 if trying to delete non existing item", () => {
+    return request(app)
+      .delete("/api/articles/88")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
+});

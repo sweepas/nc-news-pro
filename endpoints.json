@@ -157,5 +157,18 @@
         }
       
     }
+  },
+  "POST /api/topics":{
+    "description": "post new topic",
+    "exampleResponse": {
+      "response": 
+        {
+          "slug": "programing"
+        }   
+    }
+  },
+  "DELETE /api/articles/:article_id":{
+    "description": "deletes article with all corresponding comments. Sends nothing back.",
+    
   }
 }

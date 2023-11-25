@@ -125,7 +125,7 @@ exports.fetchCommentsByArticleId = (article_id, page, limit) => {
   FROM comments
   WHERE article_id = $1
   ORDER BY created_at DESC`;
-  //console.log(isNaN(page));
+
   if (page || limit) {
     if (
       (page !== undefined && (isNaN(page) || page < 1)) ||
@@ -161,5 +161,21 @@ exports.addNewArticle = (author, title, body, topic, article_img_url) => {
   (SELECT COUNT(*) FROM comments WHERE article_id = articles.article_id) AS comment_count;`;
   return db.query(query, insertValues).then((results) => {
     return results.rows[0];
+  });
+};
+
+exports.removeArticleAndComments = (article_id) => {
+  return Promise.all([
+    db.query("DELETE FROM comments WHERE article_id = $1 RETURNING *;", [
+      article_id,
+    ]),
+    db.query("DELETE FROM articles WHERE article_id = $1 RETURNING *;", [
+      article_id,
+    ]),
+  ]).then(([commentsResults, articlesResults]) => {
+    if (articlesResults.rowCount < 1) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+    return "article deleted!";
   });
 };
