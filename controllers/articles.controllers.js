@@ -4,6 +4,7 @@ const {
   fetchCommentsByArticleId,
   editArticleById,
   insertNewComment,
+  addNewArticle,
 } = require("../models/articles.models");
 
 exports.getArticlesByID = (req, res, next) => {
@@ -58,6 +59,17 @@ exports.patchArticleById = (req, res, next) => {
   editArticleById(articleId, inc_votes)
     .then((result) => {
       res.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postNewArticle = (req, res, next) => {
+  const { author, title, body, topic, article_img_url } = req.body;
+  addNewArticle(author, title, body, topic, article_img_url)
+    .then((result) => {
+      res.status(201).send(result);
     })
     .catch((err) => {
       next(err);

@@ -618,19 +618,95 @@ describe("PATCH /api/comments/:comment_id", () => {
     });
   });
 });
-// describe("POST /api/articles", () => {
-//   test("returns 201 with relevant properties", () => {
-//     const body = {
-//       author: "author",
-//       title: "title",
-//       body: "lorem ipsum",
-//       topic: "topic",
-//       article_img_url: "",
-//     };
-//     return request(app)
-//       .post("/api/articles")
-//       .send(body)
-//       .expect(201)
-//       .then(({ body }) => {});
-//   });
-// });
+describe("POST /api/articles", () => {
+  test("returns 201 with relevant properties", () => {
+    const body = {
+      author: "lurker",
+      title: "title",
+      body: "lorem ipsum",
+      topic: "mitch",
+      article_img_url: "sd",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.votes).toBe(0);
+        expect(body.article_id).toBe(14);
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("comment_count");
+        expect(body).toHaveProperty("votes");
+        expect(body).toHaveProperty("created_at");
+      });
+  });
+  test("returns 404 if user is not in the database", () => {
+    const body = {
+      author: "not-a-user",
+      title: "title",
+      body: "lorem ipsum",
+      topic: "mitch",
+      article_img_url: "sd",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
+  test("returns 404 if topic is not existing", () => {
+    const body = {
+      author: "lurker",
+      title: "title",
+      body: "lorem ipsum",
+      topic: "footbal",
+      article_img_url: "sd",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
+  test("returns 401 if body is empty", () => {
+    const body = {
+      author: "lurker",
+      title: "title",
+      body: "",
+      topic: "footbal",
+      article_img_url:
+        "https://jobs.ficsi.in/assets/front_end/images/no-image-found.jpg",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
+  test("returns 201 if article_img_url is not provided (inserts default)", () => {
+    const body = {
+      author: "lurker",
+      title: "title",
+      body: "lorem ipsum",
+      topic: "mitch",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.votes).toBe(0);
+        expect(body.article_id).toBe(14);
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("comment_count");
+        expect(body).toHaveProperty("votes");
+        expect(body).toHaveProperty("created_at");
+      });
+  });
+});

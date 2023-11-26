@@ -119,6 +119,20 @@ exports.fetchCommentsByArticleId = (article_id) => {
   });
 };
 
-exports.postNewArticle = (body) => {
-  return db.query();
+exports.addNewArticle = (author, title, body, topic, article_img_url) => {
+  const regex = new RegExp(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g);
+  console.log(regex.test(article_img_url));
+  if (!regex.test(article_img_url) || !article_img_url) {
+    article_img_url =
+      "https://jobs.ficsi.in/assets/front_end/images/no-image-found.jpg";
+  }
+
+  const insertValues = [author, title, body, topic, article_img_url];
+  let query = `INSERT INTO articles (author, title, body, topic, article_img_url) 
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING article_id, votes, created_at, 
+  (SELECT COUNT(*) FROM comments WHERE article_id = articles.article_id) AS comment_count;`;
+  return db.query(query, insertValues).then((results) => {
+    return results.rows[0];
+  });
 };
