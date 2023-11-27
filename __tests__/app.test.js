@@ -235,7 +235,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           expect(body.msg).toBe("bad request");
         });
     });
-    test("should respond with 404 not found when id is not found", () => {
+    test("should respond with 404 not found when id is not existing", () => {
       const newComment = {
         username: "rogersop",
         body: "example of comprehensive and non biased comment",
@@ -707,6 +707,78 @@ describe("POST /api/articles", () => {
         expect(body).toHaveProperty("comment_count");
         expect(body).toHaveProperty("votes");
         expect(body).toHaveProperty("created_at");
+      });
+  });
+});
+describe("GET /api/articles (topic query)", () => {
+  test("should respond with 200 and article array with relevant topic", () => {
+    return request(app)
+      .get("/api/articles?page=1&limit=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+        expect(body).toHaveProperty("total_count");
+        body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).toHaveProperty("author");
+        });
+      });
+  });
+  test("should rdefault limit to 10 if not provided", () => {
+    return request(app)
+      .get("/api/articles?page=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+      });
+  });
+  test("should rdefault limit to 10 if not provided", () => {
+    return request(app)
+      .get("/api/articles?page=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+      });
+  });
+  test("should default limit to 10 if not provided and work with other filters", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&page=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+        expect(body.articles[5].topic).toBe("mitch");
+      });
+  });
+  test("should work with other filters", () => {
+    return request(app)
+      .get("/api/articles?topic=cats&page=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(1);
+        expect(body.total_count).toBe(1);
+        expect(body.articles[0].topic).toBe("cats");
+      });
+  });
+  test("should return 400 if provided with negative or non numerical values", () => {
+    return request(app)
+      .get("/api/articles?page=-1&limit=c")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+  test("should return 400 if page requested exceeds total count of articles", () => {
+    return request(app)
+      .get("/api/articles?page=10")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
       });
   });
 });

@@ -19,11 +19,30 @@ exports.getArticlesByID = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const { topic, sortby, order } = req.query;
+  const { topic, sortby, order, limit = 10, page } = req.query;
+
   fetchAllArticles(topic, sortby, order)
     .then((data) => {
-      const articles = { articles: data };
-      res.status(200).send(articles);
+      let result = [];
+      const total_count = data.length;
+      if (page) {
+        const offset = (page - 1) * limit;
+        if (
+          isNaN(page) ||
+          page < 1 ||
+          isNaN(limit) ||
+          limit < 1 ||
+          offset > total_count
+        ) {
+          return Promise.reject({ status: 400, msg: "bad request" });
+        }
+        const paginatedData = data.slice(offset, offset + parseInt(limit));
+        result = paginatedData;
+      } else {
+        result = data;
+      }
+
+      res.status(200).send({ articles: result, total_count: total_count });
     })
     .catch((err) => {
       next(err);
