@@ -148,7 +148,9 @@ exports.fetchCommentsByArticleId = (article_id, page, limit) => {
 };
 
 exports.addNewArticle = (author, title, body, topic, article_img_url) => {
-  const regex = new RegExp(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g);
+  const regex = new RegExp(
+    /^(https?):\/\/[^\s\/$.?#].[^\s]*\.(jpg|gif|png)$/gi
+  );
   if (!regex.test(article_img_url) || !article_img_url) {
     article_img_url =
       "https://jobs.ficsi.in/assets/front_end/images/no-image-found.jpg";
