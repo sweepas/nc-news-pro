@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
 
 const {
   handleCustomErrors,
@@ -13,6 +14,7 @@ const commentsRouter = require("./routes/comments-router");
 const usersRouter = require("./routes/user-router");
 
 const app = express();
+app.use(compression());
 
 app.use(express.json());
 
